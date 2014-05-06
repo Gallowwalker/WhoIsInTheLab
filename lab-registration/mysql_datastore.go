@@ -3,16 +3,23 @@ package main
 import (
 	 "log"
 	"fmt"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	_"github.com/go-sql-driver/mysql"
 )
+
+
+const defaultPort = ":3306"
 
 type MySqlDatastore struct {
 	db *sqlx.DB
 }
 
 func CreateMySqlDatastore(user, pass, host, dbName string) (DataStore) {
+	if len(strings.Split(host, ":")) == 1 {
+		host = host + defaultPort
+	}
 	db, err := sqlx.Connect("mysql", user + ":" + pass + "@tcp(" + host +")/" + dbName)
 	if (err != nil) {
 		log.Fatal(err)
