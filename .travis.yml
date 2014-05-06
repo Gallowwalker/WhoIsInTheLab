@@ -5,7 +5,7 @@ go:
 
 before_install: cd lab-registration
 script:
-        go get -v github.com/smartystreets/goconvey &&
+        go get -v -t github.com/smartystreets/goconvey &&
         go test
 notifications:
           email: false

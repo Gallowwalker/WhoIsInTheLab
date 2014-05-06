@@ -27,7 +27,6 @@ func ReqInterceptor(c martini.Context, w http.ResponseWriter, r *http.Request) {
 func SetupMartini() (*martini.Martini) {
 	m := martini.New()
 	m.Use(martini.Recovery())
-	m.Use(martini.Logger())
 	m.Use(ReqInterceptor)
 
 	r := martini.NewRouter()
@@ -44,6 +43,7 @@ func main() {
 	conf := ReadConfig(configFile)
 
 	m := SetupMartini()
+	m.Use(martini.Logger())
 	var dataStore DataStore = CreateMysqlDataStoreFromConfig(conf)
 	m.MapTo(dataStore, (*DataStore)(nil))
 	m.Map(arpTableFile)
