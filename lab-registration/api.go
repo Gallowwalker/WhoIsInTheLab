@@ -10,9 +10,9 @@ import (
 )
 
 
-func GetMac(res http.ResponseWriter, req *http.Request, enc encoder.Encoder) (int, []byte) {
+func GetMac(res http.ResponseWriter, req *http.Request, enc encoder.Encoder, arpFile string) (int, []byte) {
 	ip := strings.Split(req.RemoteAddr, ":")[0]
-	mac, err := GetMacAddress("/proc/net/arp", ip)
+	mac, err := GetMacAddress(arpFile, ip)
 	if err != nil {
 		return http.StatusNotFound, encoder.Must(enc.Encode(NewError(ErrMacNotFound, err.Error())))
 	}

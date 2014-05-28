@@ -8,6 +8,8 @@ import (
 	"fmt"
 )
 
+const macAddressField = 3
+
 func checkError(err error) {
 	if err != nil {
 		log.Fatal(err)
@@ -32,5 +34,5 @@ func GetMacAddress(arpFile string, ip string) (string, error) {
 	}
 	fields := strings.Fields(entry)
 	// This is the mac address field
-	return fields[3], nil
+	return fields[macAddressField], nil
 }
