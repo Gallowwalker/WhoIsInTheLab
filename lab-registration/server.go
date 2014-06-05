@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/encoder"
 	"flag"
 )
@@ -33,6 +34,7 @@ func SetupMartini() (*martini.Martini) {
 	r.Get("/mac", GetMac)
 	r.Get("/users/:id", GetUser)
 	r.Get("/users", GetUsers)
+	r.Post("/users", binding.Json(User{}), AddUser)
 	m.Action(r.Handle)
 	return m
 }

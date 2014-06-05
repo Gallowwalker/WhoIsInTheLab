@@ -5,16 +5,35 @@ import (
 	"net/http/httptest"
 	"testing"
 	"encoding/json"
+	"strings"
+	"flag"
 
 	"github.com/go-martini/martini"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+var testDbConfigFile string
+
+const defaultTestConfig = "./test-data/db.cfg"
+
+func init() {
+	flag.StringVar(&testDbConfigFile, "testconfig", defaultTestConfig, "Test database config file")
+}
 func MockApi() *martini.Martini {
 	m := SetupMartini()
 	m.Map("test-data/arp-data")
 	return m
 }
+
+func DbApi() *martini.Martini {
+	m := MockApi()
+	conf := ReadConfig(testDbConfigFile)
+	var dataStore DataStore = CreateTestMysqlDataStoreFromConfig(conf)
+
+	m.MapTo(dataStore, (*DataStore)(nil))
+	return m
+}
+
 
 func TestMacAPI(t *testing.T) {
 	Convey("Given that user hits /mac endpoint with an ip address that is present in the arp table", t, func() {
@@ -51,4 +70,20 @@ func TestMacAPI(t *testing.T) {
 			So(w.Code, ShouldEqual, 404)
 		})
 	})
+}
+func TestAddUser(t *testing.T) {
+	Convey("Given that add user endpoint is called with valid data", t, func() {
+		userJson := ReadFile("./test-data/test_user.json")
+		r, _ := http.NewRequest("POST", "/users", strings.NewReader(userJson))
+		w := httptest.NewRecorder()
+		DbApi().ServeHTTP(w, r)
+
+		var result map[string]interface{}
+		Convey("it should respond with success and id of newly created user", func() {
+			json.Unmarshal(w.Body.Bytes(), &result)
+			So(w.Code, ShouldEqual, 200)
+			So(result["success"], ShouldEqual, true)
+		})
+	})
+
 }

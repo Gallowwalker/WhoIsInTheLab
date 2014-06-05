@@ -39,3 +39,12 @@ func GetUser(dataStore DataStore, enc encoder.Encoder, params martini.Params) (i
 	}
 	return http.StatusOK, encoder.Must(enc.Encode(user))
 }
+
+func AddUser(user User, enc encoder.Encoder, dataStore DataStore) (int, []byte) {
+	id, err := dataStore.AddUser(user)
+	if err != nil {
+		return http.StatusBadRequest, encoder.Must(enc.Encode(NewError(ErrInternal, "Cannot create user")))
+	}
+
+	return http.StatusOK, encoder.Must(enc.Encode(map[string]interface{} {"success": true, "id": id}))
+}
