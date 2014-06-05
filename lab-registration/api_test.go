@@ -9,6 +9,7 @@ import (
 	"flag"
 
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/binding"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -83,6 +84,20 @@ func TestAddUser(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &result)
 			So(w.Code, ShouldEqual, 200)
 			So(result["success"], ShouldEqual, true)
+		})
+	})
+	Convey("Given that add user endpoint is called with a user with empty first name", t, func() {
+		userJson := ReadFile("./test-data/invalid_user.json")
+		r, _ := http.NewRequest("POST", "/users", strings.NewReader(userJson))
+		w := httptest.NewRecorder()
+		DbApi().ServeHTTP(w, r)
+
+		var errors binding.Errors
+		Convey("it shold respond with error message saying that firstname must not be empty", func() {
+			json.Unmarshal(w.Body.Bytes(), &errors)
+			So(w.Code, ShouldEqual, 400)
+			So(errors.Has("Incorrect data"), ShouldBeTrue)
+			So(errors[0].FieldNames[0], ShouldEqual, "firstname")
 		})
 	})
 

@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"strings"
 	"strconv"
+	"encoding/json"
 
 	"github.com/martini-contrib/encoder"
+	"github.com/martini-contrib/binding"
 	"github.com/go-martini/martini"
 )
 
@@ -40,7 +42,11 @@ func GetUser(dataStore DataStore, enc encoder.Encoder, params martini.Params) (i
 	return http.StatusOK, encoder.Must(enc.Encode(user))
 }
 
-func AddUser(user User, enc encoder.Encoder, dataStore DataStore) (int, []byte) {
+func AddUser(user User, enc encoder.Encoder, dataStore DataStore, bindErrors binding.Errors) (int, []byte) {
+	if len(bindErrors) > 0 {
+		errors, _ := json.Marshal(bindErrors)
+		return http.StatusBadRequest, errors
+	}
 	id, err := dataStore.AddUser(user)
 	if err != nil {
 		return http.StatusBadRequest, encoder.Must(enc.Encode(NewError(ErrInternal, "Cannot create user")))
