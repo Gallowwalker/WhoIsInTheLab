@@ -5,7 +5,11 @@ import (
 )
 
 func ExecuteSql(sqlFile string, dbcfg Config) (string, error) {
-	mysqlOut, err := exec.Command("sh" , "-c", "mysql" +  " -u " + dbcfg.Username + " -p" + dbcfg.Password + " " + dbcfg.Database + " < " + sqlFile).Output()
+	password := " -p" + dbcfg.Password
+	if len(dbcfg.Password) == 0 {
+		password = ""
+	}
+	mysqlOut, err := exec.Command("sh" , "-c", "mysql" +  " -u " + dbcfg.Username + password + " " + dbcfg.Database + " < " + sqlFile).Output()
 	if err != nil {
 		return  "", err
 	}
