@@ -75,7 +75,6 @@ func (d MySqlDatastore) GetUser(id int) (User, error) {
 func (d MySqlDatastore) AddUser(u User) (int64, error) {
 	res, err := d.db.NamedExec(`INSERT INTO who_users (user_name1, user_name2, user_twitter, user_facebook, user_tel, user_website, user_fstoken, user_google_plus, user_fscheckin) VALUES (:user_name1, :user_name2, :user_twitter, :user_facebook, :user_tel, :user_website, :user_fstoken, :user_google_plus, :user_fscheckin)`, &u)
 	if err != nil {
-		log.Fatal(err)
 		return 0, err
 	}
 	id, err := res.LastInsertId()
@@ -91,4 +90,17 @@ func (d MySqlDatastore) GetDevicesByUserId(id int) ([]Device, error) {
 	}
 
 	return devices, nil
+}
+
+func (d MySqlDatastore) AddDevice(userId int, device Device) (int64, error) {
+	_, notFound := d.GetUser(userId)
+	if notFound != nil {
+		return 0, notFound
+	}
+	res, err := d.db.NamedExec(`INSERT INTO who_devices (device_MAC, device_comment, device_uid) VALUES (:device_MAC, :device_comment, :device_uid)`, &device)
+	if err != nil {
+		return 0, err
+	}
+	id, err := res.LastInsertId()
+	return id, err
 }

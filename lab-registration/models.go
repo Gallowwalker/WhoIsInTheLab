@@ -30,3 +30,8 @@ type Device struct {
 	UserId int32 `db:"device_uid" json:"user_id"`
 	Comment string `db:"device_comment" json:"comment"`
 }
+
+type AddResponse struct {
+	Success bool `json:"success"`
+	Id int64 `json:"id"`
+}

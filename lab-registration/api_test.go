@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"strings"
 	"flag"
+	"fmt"
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
@@ -79,11 +80,12 @@ func TestAddUser(t *testing.T) {
 		w := httptest.NewRecorder()
 		DbApi().ServeHTTP(w, r)
 
-		var result map[string]interface{}
+		result := AddResponse{}
 		Convey("it should respond with success and id of newly created user", func() {
 			json.Unmarshal(w.Body.Bytes(), &result)
 			So(w.Code, ShouldEqual, 200)
-			So(result["success"], ShouldEqual, true)
+			So(result.Success, ShouldEqual, true)
+			So(result.Id, ShouldBeGreaterThan, 0)
 		})
 	})
 	Convey("Given that add user endpoint is called with a user with empty first name", t, func() {
@@ -101,4 +103,50 @@ func TestAddUser(t *testing.T) {
 		})
 	})
 
+}
+func TestAddDevice(t *testing.T) {
+	Convey("Given that  add device for a given user endpoint is called with valid data", t, func() {
+		deviceJson := ReadFile("./test-data/test_device.json")
+		dbApi := DbApi()
+		userResult := insertTestUser(dbApi)
+		endpoint := fmt.Sprintf("/users/%d/devices", userResult.Id)
+
+		r, _ := http.NewRequest("POST", endpoint, strings.NewReader(deviceJson))
+		w := httptest.NewRecorder()
+		dbApi.ServeHTTP(w, r)
+
+		result := AddResponse{}
+		Convey("it should respond with success and id of newly created device", func() {
+			json.Unmarshal(w.Body.Bytes(), &result)
+			So(w.Code, ShouldEqual, 200)
+			So(result.Success, ShouldEqual, true)
+			So(result.Id, ShouldBeGreaterThan, 0)
+		})
+	})
+	Convey("Given that add device endpoint is called with invalid user id", t, func() {
+		deviceJson := ReadFile("./test-data/test_device.json")
+		dbApi := DbApi()
+		endpoint := fmt.Sprintf("/users/%d/devices", 23)
+
+		r, _ := http.NewRequest("POST", endpoint, strings.NewReader(deviceJson))
+		w := httptest.NewRecorder()
+		dbApi.ServeHTTP(w, r)
+
+		result := Error{}
+		Convey("it should respond with error saying that user doesen't exists", func() {
+			json.Unmarshal(w.Body.Bytes(), &result)
+			So(w.Code, ShouldEqual, 400)
+			So(result.Message, ShouldEqual, "Cannot add device")
+		})
+	})
+}
+
+func insertTestUser(api *martini.Martini) (AddResponse) {
+		userJson := ReadFile("./test-data/test_user.json")
+		r, _ := http.NewRequest("POST", "/users", strings.NewReader(userJson))
+		w := httptest.NewRecorder()
+		api.ServeHTTP(w, r)
+		result := AddResponse{}
+		json.Unmarshal(w.Body.Bytes(), &result)
+		return result
 }
