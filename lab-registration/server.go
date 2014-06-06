@@ -19,29 +19,26 @@ func init() {
 	flag.StringVar(&configFile, "config", defaultConfig, "Database config file")
 }
 
-func ReqInterceptor(c martini.Context, w http.ResponseWriter, r *http.Request) {
-	if r.RequestURI != "/" {
-		c.MapTo(encoder.JsonEncoder{}, (*encoder.Encoder)(nil))
-		w.Header().Set("Content-Type", "application/json")
-	}
+func JsonContent(c martini.Context, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 }
 
 
 func SetupMartini() (*martini.Martini) {
 	m := martini.New()
 	m.Use(martini.Recovery())
-	m.Use(ReqInterceptor)
+	m.MapTo(encoder.JsonEncoder{}, (*encoder.Encoder)(nil))
 
 	r := martini.NewRouter()
 	r.Get("/", func (r *http.Request) string {
 		return ReadFile("./public/index.html")
 	})
-	r.Get("/mac", GetMac)
-	r.Get("/users/:id", GetUser)
-	r.Get("/users", GetUsers)
-	r.Get("/users/:id/devices", GetDevicesByUser)
-	r.Post("/users", binding.Json(User{}), AddUser)
-	r.Post("/users/:id/devices", binding.Json(Device{}), AddDevice)
+	r.Get("/mac", JsonContent, GetMac)
+	r.Get("/users/:id", JsonContent, GetUser)
+	r.Get("/users", JsonContent, GetUsers)
+	r.Get("/users/:id/devices", JsonContent, GetDevicesByUser)
+	r.Post("/users", JsonContent, binding.Json(User{}), AddUser)
+	r.Post("/users/:id/devices", JsonContent, binding.Json(Device{}), AddDevice)
 	m.Action(r.Handle)
 	return m
 }
