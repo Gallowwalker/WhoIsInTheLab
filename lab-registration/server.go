@@ -3,11 +3,11 @@ package main
 import (
 	"net/http"
 	"log"
+	"flag"
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/encoder"
-	"flag"
 )
 
 var configFile string
@@ -20,8 +20,10 @@ func init() {
 }
 
 func ReqInterceptor(c martini.Context, w http.ResponseWriter, r *http.Request) {
-	c.MapTo(encoder.JsonEncoder{}, (*encoder.Encoder)(nil))
-	w.Header().Set("Content-Type", "application/json")
+	if r.RequestURI != "/" {
+		c.MapTo(encoder.JsonEncoder{}, (*encoder.Encoder)(nil))
+		w.Header().Set("Content-Type", "application/json")
+	}
 }
 
 
@@ -31,6 +33,9 @@ func SetupMartini() (*martini.Martini) {
 	m.Use(ReqInterceptor)
 
 	r := martini.NewRouter()
+	r.Get("/", func (r *http.Request) string {
+		return ReadFile("./public/index.html")
+	})
 	r.Get("/mac", GetMac)
 	r.Get("/users/:id", GetUser)
 	r.Get("/users", GetUsers)
@@ -48,6 +53,7 @@ func main() {
 
 	m := SetupMartini()
 	m.Use(martini.Logger())
+	m.Use(martini.Static("public"))
 	var dataStore DataStore = CreateMysqlDataStoreFromConfig(conf)
 	m.MapTo(dataStore, (*DataStore)(nil))
 	m.Map(arpTableFile)

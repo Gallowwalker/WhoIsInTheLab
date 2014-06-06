@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en" ng-app="lab-registration">
+<head>
+	<meta charset="utf-8">
+	<title>My HTML File</title>
+	<link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.css">
+	<script src="libs/angular/angular.js"></script>
+	<script src="js/controllers.js"></script>
+</head>
+<body ng-controller="LabRegCtrl">
+
+<ul>
+	<li ng-repeat="user in users">
+		<span>{{user.firstname}}</span>
+		<p>{{user.lastname}}</p>
+	</li>
+</ul>
+
+</body>
+</html>
