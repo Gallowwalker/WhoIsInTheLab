@@ -83,3 +83,12 @@ func (d MySqlDatastore) AddUser(u User) (int64, error) {
 
 }
 
+func (d MySqlDatastore) GetDevicesByUserId(id int) ([]Device, error) {
+	devices := []Device{}
+	err := d.db.Select(&devices, "SELECT * FROM who_devices WHERE device_uid=?", id)
+	if err != nil {
+		return nil, fmt.Errorf("User with id %d not found", id)
+	}
+
+	return devices, nil
+}

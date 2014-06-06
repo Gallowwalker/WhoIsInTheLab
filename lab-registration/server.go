@@ -34,6 +34,7 @@ func SetupMartini() (*martini.Martini) {
 	r.Get("/mac", GetMac)
 	r.Get("/users/:id", GetUser)
 	r.Get("/users", GetUsers)
+	r.Get("/users/:id/devices", GetDevicesByUser)
 	r.Post("/users", binding.Json(User{}), AddUser)
 	m.Action(r.Handle)
 	return m

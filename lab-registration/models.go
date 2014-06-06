@@ -24,3 +24,9 @@ type User struct {
 	FoursquareCheckin string  `db:"user_fscheckin" json:"fs_checkin"`
 }
 
+type Device struct {
+	Id int32 `db:"device_id" json:"id"`
+	MAC string `db:"device_MAC" json:"MAC"`
+	UserId int32 `db:"device_uid" json:"user_id"`
+	Comment string `db:"device_comment" json:"comment"`
+}

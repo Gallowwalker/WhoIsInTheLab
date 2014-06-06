@@ -24,7 +24,7 @@ func GetMac(res http.ResponseWriter, req *http.Request, enc encoder.Encoder, arp
 func GetUsers(dataStore DataStore, enc encoder.Encoder) (int, []byte) {
 	users, err := dataStore.GetAllUsers()
 	if err != nil {
-		return http.StatusNoContent, encoder.Must(enc.Encode(NewError(ErrInternal, "Can't get users try again later")))
+		return http.StatusNotFound, encoder.Must(enc.Encode(NewError(ErrInternal, "Can't get users try again later")))
 	}
 	return http.StatusOK, encoder.Must(enc.Encode(users))
 }
@@ -53,4 +53,16 @@ func AddUser(user User, enc encoder.Encoder, dataStore DataStore, bindErrors bin
 	}
 
 	return http.StatusOK, encoder.Must(enc.Encode(map[string]interface{} {"success": true, "id": id}))
+}
+
+func GetDevicesByUser(dataStore DataStore, enc encoder.Encoder, params martini.Params) (int, []byte) {
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		return http.StatusNotFound, encoder.Must(enc.Encode(NewError(ErrInternal, "Invalid id")))
+	}
+	devices, err := dataStore.GetDevicesByUserId(id)
+	if err != nil {
+		return http.StatusNotFound, encoder.Must(enc.Encode(NewError(ErrInternal, "Can't get user's devices try again later")))
+	}
+	return http.StatusOK, encoder.Must(enc.Encode(devices))
 }
