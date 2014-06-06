@@ -24,6 +24,5 @@ Hackafe device registration form for WhoIsInTheLab written in GO
 2. Install [bower](http://bower.io/)
 3. Run  **bower install** in lab-registration dir 
 4. Open [http://127.0.0.1:8080/](http://127.0.0.1:8080) in a browser
-5. Even more profit :)
-
-
+5. Client side code is in **public** directory 
+6. Even more profit :)
