@@ -13,7 +13,7 @@ import (
 var configFile string
 
 const defaultConfig = "./config/db.cfg"
-const arpTableFile = "proc/net/arp"
+const arpTableFile = "/proc/net/arp"
 
 func init() {
 	flag.StringVar(&configFile, "config", defaultConfig, "Database config file")
