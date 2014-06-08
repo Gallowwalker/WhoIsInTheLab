@@ -3,6 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Lab ragistration</title>
 	<script src="libs/angular/angular.js"></script>
 	<script src="libs/angular-sanitize/angular-sanitize.js"></script>
@@ -22,36 +23,60 @@
 
 		<div class="jumbotron">
 			<h3>Device information</h3>
-			<form class="form-horizontal" role="form">
-				<div class="form-group">
+			<p class="bg-danger" ng-show="hasApiError">{{ errors }}</p>
+			<p class="bg-success" ng-show="success">Device was added successfully</p>
+			<form class="form-horizontal" name="form" role="form">
+				<div class="form-group {{ macValid == false ? 'has-error has-feedback' :''}} ">
 					<label class="col-sm-2 control-label">MAC</label>
 					<div class="col-sm-10">
-						<input class="form-control" ng-model="device.mac" id="disabledInput" type="text" disabled>
+						<input class="form-control" ng-model="device.MAC" id="disabledInput" type="text" disabled>
+						<span class="glyphicon glyphicon-remove form-control-feedback" ng-show="!macValid">
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="comment" class="col-sm-2 control-label">Comment</label>
+					<label for="comment" class="col-sm-2 control-label">Comment*</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" ng-model="device.comment">
+						<input type="text" class="form-control" ng-model="device.comment" required>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label class="col-sm-2 control-label">Owner</label>
 					<div class="col-sm-10">
-						<ui-select ng-model="user.selected" theme="bootstrap">
-						<ui-select-match placeholder="Select or search owner">{{$select.selected.firstname + ' ' + $select.selected.lastname}}</ui-select-match>
+						<ui-select ng-model="user.selected" ng-change="ownerSelected(user)" theme="bootstrap">
+							<ui-select-match placeholder="Select or search owner">{{$select.selected.firstname + ' ' + $select.selected.lastname}}</ui-select-match>
 							<ui-select-choices repeat="user in users | filter: $select.search">
 								<span ng-bind-html="user.firstname | highlight: $select.search"></span>
-								<span ng-bind-html="user.lastname | highlight: $select.search"></span>
-							</ui-select-choices>
+						<span ng-bind-html="user.lastname | highlight: $select.search"></span>
+						</ui-select-choices>
 						</ui-select>
 					</div>
 				</div>
+				<h3>Owner information</h3>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Firstname</label>
+					<div class="col-sm-10">
+						<input class="form-control" ng-model="owner.firstname" type="text" required />
+					</div>
+				</div>
 
-				<button ng-click="submitDevice(device)" class="btn btn-success">Register</u>
-			</form>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Lastname</label>
+					<div class="col-sm-10">
+						<input class="form-control" ng-model="owner.lastname" type="text" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">E-Mail</label>
+					<div class="col-sm-10">
+						<input class="form-control" ng-model="owner.email" type="text" required />
+					</div>
+				</div>
+				<button ng-disabled="!macValid || form.$invalid" ng-click="submitDevice(device)" class="btn btn-success">Register</button>
 		</div>
+
+		</form>
 
 		<div class="footer">
 			<p>&copy; Hackafe 2014</p>
