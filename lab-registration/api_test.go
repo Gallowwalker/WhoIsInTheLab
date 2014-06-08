@@ -102,6 +102,31 @@ func TestAddUser(t *testing.T) {
 			So(errors[0].FieldNames[0], ShouldEqual, "firstname")
 		})
 	})
+	Convey("Given that update user endpoint is called with valid data", t, func() {
+		dbApi := DbApi()
+		userResult := insertTestUser(dbApi)
+		endpoint := fmt.Sprintf("/users/%d", userResult.Id)
+
+		r, _ := http.NewRequest("PUT", endpoint, strings.NewReader(ReadFile("./test-data/test_user_modified.json")))
+		w := httptest.NewRecorder()
+		dbApi.ServeHTTP(w, r)
+
+		result := AddResponse{}
+		Convey("it should successfully update users data", func() {
+			json.Unmarshal(w.Body.Bytes(), &result)
+			So(w.Code, ShouldEqual, 200)
+			So(result.Success, ShouldEqual, true)
+			So(result.Id, ShouldBeGreaterThan, 0)
+			user := getUser(dbApi, result.Id)
+			So(user.FirstName, ShouldEqual, "JohnDoe")
+			So(user.Facebook, ShouldEqual, "john.the.doe")
+			So(user.Phone, ShouldEqual, "911")
+			So(user.Twitter, ShouldEqual, "johndoe.the.great")
+			So(user.Email, ShouldEqual, "johndoe@example.com")
+		})
+
+
+	})
 
 }
 func TestAddDevice(t *testing.T) {
@@ -148,5 +173,15 @@ func insertTestUser(api *martini.Martini) (AddResponse) {
 		api.ServeHTTP(w, r)
 		result := AddResponse{}
 		json.Unmarshal(w.Body.Bytes(), &result)
+		return result
+}
+
+func getUser(api *martini.Martini, userId int64) (User) {
+		r, _ := http.NewRequest("GET", fmt.Sprintf("/users/%d", userId), nil)
+		w := httptest.NewRecorder()
+		api.ServeHTTP(w, r)
+		result := User{}
+		json.Unmarshal(w.Body.Bytes(), &result)
+
 		return result
 }

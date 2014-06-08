@@ -73,13 +73,22 @@ func (d MySqlDatastore) GetUser(id int) (User, error) {
 }
 
 func (d MySqlDatastore) AddUser(u User) (int64, error) {
-	res, err := d.db.NamedExec(`INSERT INTO who_users (user_name1, user_name2, user_twitter, user_facebook, user_tel, user_website, user_fstoken, user_google_plus, user_fscheckin) VALUES (:user_name1, :user_name2, :user_twitter, :user_facebook, :user_tel, :user_website, :user_fstoken, :user_google_plus, :user_fscheckin)`, &u)
+	res, err := d.db.NamedExec(`INSERT INTO who_users (user_name1, user_name2, user_twitter, user_email, user_facebook, user_tel, user_website, user_fstoken, user_google_plus, user_fscheckin) VALUES (:user_name1, :user_name2, :user_twitter, :user_email, :user_facebook, :user_tel, :user_website, :user_fstoken, :user_google_plus, :user_fscheckin)`, &u)
 	if err != nil {
 		return 0, err
 	}
 	id, err := res.LastInsertId()
 	return id, err
 
+}
+func (d MySqlDatastore) UpdateUser(userId int, u User) (error) {
+	u.Id = int32(userId)
+	_, err := d.db.NamedExec(`UPDATE who_users SET user_name1=:user_name1, user_name2=:user_name2, user_twitter=:user_twitter, user_email=:user_email, user_facebook=:user_facebook, user_tel=:user_tel, user_website=:user_website, user_google_plus=:user_google_plus WHERE user_id = :user_id `, &u)
+	if err != nil {
+		log.Println(err)
+		return  err
+	}
+	return nil
 }
 
 func (d MySqlDatastore) GetDevicesByUserId(id int) ([]Device, error) {

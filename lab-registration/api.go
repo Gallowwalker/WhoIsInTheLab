@@ -55,6 +55,23 @@ func AddUser(user User, enc encoder.Encoder, dataStore DataStore, bindErrors bin
 	response := AddResponse{Success: true, Id: id}
 	return http.StatusOK, encoder.Must(enc.Encode(response))
 }
+func UpdateUser(user User, enc encoder.Encoder, dataStore DataStore, params martini.Params, bindErrors binding.Errors) (int, []byte) {
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		return http.StatusNotFound, encoder.Must(enc.Encode(NewError(ErrInternal, "Invalid id")))
+	}
+	if len(bindErrors) > 0 {
+		errors, _ := json.Marshal(bindErrors)
+		return http.StatusBadRequest, errors
+	}
+	err = dataStore.UpdateUser(id, user)
+	if err != nil {
+		return http.StatusBadRequest, encoder.Must(enc.Encode(NewError(ErrInternal, "Cannot update user")))
+	}
+
+	response := AddResponse{Success: true, Id: int64(id)}
+	return http.StatusOK, encoder.Must(enc.Encode(response))
+}
 
 func GetDevicesByUser(dataStore DataStore, enc encoder.Encoder, params martini.Params) (int, []byte) {
 	id, err := strconv.Atoi(params["id"])
