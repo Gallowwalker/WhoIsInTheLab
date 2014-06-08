@@ -1,20 +1,70 @@
 <!doctype html>
 <html lang="en" ng-app="lab-registration">
+
 <head>
 	<meta charset="utf-8">
-	<title>My HTML File</title>
-	<link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.css">
+	<title>Lab ragistration</title>
 	<script src="libs/angular/angular.js"></script>
+	<script src="libs/angular-sanitize/angular-sanitize.js"></script>
+	<script src="libs/angular-ui-select/dist/select.js"></script>
 	<script src="js/controllers.js"></script>
+	<!-- CSS -->
+	<link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" href="libs/angular-ui-select/dist/select.css">
+	<link href="css/jumbotron-narrow.css" rel="stylesheet">
 </head>
-<body ng-controller="LabRegCtrl">
 
-<ul>
-	<li ng-repeat="user in users">
-		<span>{{user.firstname}}</span>
-		<p>{{user.lastname}}</p>
-	</li>
-</ul>
+<body role="document" ng-controller="LabRegCtrl">
+	<div class="container">
+		<div class="header">
+			<h3 class="text-muted">Lab Registration</h3>
+		</div>
+
+		<div class="jumbotron">
+			<h3>Device information</h3>
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">MAC</label>
+					<div class="col-sm-10">
+						<input class="form-control" ng-model="device.mac" id="disabledInput" type="text" disabled>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="comment" class="col-sm-2 control-label">Comment</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" ng-model="device.comment">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Owner</label>
+					<div class="col-sm-10">
+						<ui-select ng-model="user.selected" theme="bootstrap">
+						<ui-select-match placeholder="Select or search owner">{{$select.selected.firstname + ' ' + $select.selected.lastname}}</ui-select-match>
+							<ui-select-choices repeat="user in users | filter: $select.search">
+								<span ng-bind-html="user.firstname | highlight: $select.search"></span>
+								<span ng-bind-html="user.lastname | highlight: $select.search"></span>
+							</ui-select-choices>
+						</ui-select>
+					</div>
+				</div>
+
+				<button ng-click="submitDevice(device)" class="btn btn-success">Register</u>
+			</form>
+		</div>
+
+		<div class="footer">
+			<p>&copy; Hackafe 2014</p>
+		</div>
+
+	</div>
+	<!-- /container -->
+
+
+	<!-- Bootstrap core JavaScript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
 
 </body>
+
 </html>
