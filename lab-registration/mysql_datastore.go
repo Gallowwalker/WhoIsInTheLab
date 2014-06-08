@@ -97,6 +97,7 @@ func (d MySqlDatastore) AddDevice(userId int, device Device) (int64, error) {
 	if notFound != nil {
 		return 0, notFound
 	}
+	device.UserId = userId
 	res, err := d.db.NamedExec(`INSERT INTO who_devices (device_MAC, device_comment, device_uid) VALUES (:device_MAC, :device_comment, :device_uid)`, &device)
 	if err != nil {
 		return 0, err
