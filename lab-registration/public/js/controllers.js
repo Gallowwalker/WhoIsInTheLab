@@ -29,6 +29,7 @@ labRegistration.controller('LabRegCtrl', ['$scope', '$http', function ($scope, $
 
 	$scope.hasErrors = function(flag, errorMsg) {
 		$scope.hasApiError = flag;
+		$scope.success = false;
 		$scope.errors = errorMsg;
 	};
 
@@ -41,7 +42,12 @@ labRegistration.controller('LabRegCtrl', ['$scope', '$http', function ($scope, $
 				$scope.hasError(true, error.message);
 			});
 		} else {
-			$scope.apiAddDevice(device, $scope.user.selected.id);
+			$http.put('/users/' + $scope.user.selected.id, $scope.owner).success(function(response) {
+				$scope.hasErrors(false, {});
+				$scope.apiAddDevice(device, response.id);
+			}).error(function(error) {
+				$scope.hasError(true, error.message);
+			});
 		}
 	};
 
