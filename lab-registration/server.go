@@ -30,9 +30,6 @@ func SetupMartini() (*martini.Martini) {
 	m.MapTo(encoder.JsonEncoder{}, (*encoder.Encoder)(nil))
 
 	r := martini.NewRouter()
-	r.Get("/", func (r *http.Request) string {
-		return ReadFile("./public/index.html")
-	})
 	r.Get("/mac", JsonContent, GetMac)
 	r.Get("/users/:id", JsonContent, GetUser)
 	r.Get("/users", JsonContent, GetUsers)
