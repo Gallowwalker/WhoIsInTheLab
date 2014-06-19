@@ -38,25 +38,44 @@ func DbApi() *martini.Martini {
 
 
 func TestMacAPI(t *testing.T) {
-	Convey("Given that user hits /mac endpoint with an ip address that is present in the arp table", t, func() {
+	Convey("Given that user hits /mac endpoint with an ip address that is present in the arp table and mac is not reigstered", t, func() {
 		r, _ := http.NewRequest("GET", "/mac", nil)
 		r.RemoteAddr = "192.168.50.1"
 		w := httptest.NewRecorder()
-		MockApi().ServeHTTP(w, r)
+		DbApi().ServeHTTP(w, r)
 
 		var macResult map[string]interface{}
 		Convey("it should return the corresponding mac address", func() {
 			json.Unmarshal(w.Body.Bytes(), &macResult)
 			So(w.Code, ShouldEqual, 200)
 			So(macResult["mac"], ShouldEqual, "00:16:0a:13:96:7e")
+			So(macResult["registered"], ShouldEqual, false)
 		})
 	})
 
+	Convey("Given that user hits /mac endpoint with an ip address that is present in the arp table and MAC is already registered", t, func() {
+		dbApi := DbApi()
+		userId := insertTestUser(dbApi).Id
+		insert(ReadFile("./test-data/test_device.json"), fmt.Sprintf("/users/%d/devices", userId), dbApi)
+
+		r, _ := http.NewRequest("GET", "/mac", nil)
+		r.RemoteAddr = "192.168.50.1"
+		w := httptest.NewRecorder()
+		dbApi.ServeHTTP(w, r)
+
+		var macResult map[string]interface{}
+		Convey("it should return the corresponding mac address and a flag thath indicates that device is registered", func() {
+			json.Unmarshal(w.Body.Bytes(), &macResult)
+			So(w.Code, ShouldEqual, 200)
+			So(macResult["mac"], ShouldEqual, "00:16:0a:13:96:7e")
+			So(macResult["registered"], ShouldEqual, true)
+		})
+	})
 	Convey("Given that user hits /mac endpoint with an ip that is not present in arp table", t, func() {
 		r, _ := http.NewRequest("GET", "/mac", nil)
 		r.RemoteAddr = "8.8.8.8"
 		w := httptest.NewRecorder()
-		MockApi().ServeHTTP(w, r)
+		DbApi().ServeHTTP(w, r)
 
 		Convey("it should respond with error code 404", func() {
 			So(w.Code, ShouldEqual, 404)
@@ -66,7 +85,7 @@ func TestMacAPI(t *testing.T) {
 	Convey("Given that user hits /mac endpoint with an empty ip address", t, func() {
 		r, _ := http.NewRequest("GET", "/mac", nil)
 		w := httptest.NewRecorder()
-		MockApi().ServeHTTP(w, r)
+		DbApi().ServeHTTP(w, r)
 
 		Convey("it should respond with error code 404", func() {
 			So(w.Code, ShouldEqual, 404)
@@ -167,8 +186,11 @@ func TestAddDevice(t *testing.T) {
 }
 
 func insertTestUser(api *martini.Martini) (AddResponse) {
-		userJson := ReadFile("./test-data/test_user.json")
-		r, _ := http.NewRequest("POST", "/users", strings.NewReader(userJson))
+		return insert(ReadFile("./test-data/test_user.json"), "/users", api)
+}
+
+func insert(data, endpoint string, api *martini.Martini) AddResponse {
+		r, _ := http.NewRequest("POST", endpoint, strings.NewReader(data))
 		w := httptest.NewRecorder()
 		api.ServeHTTP(w, r)
 		result := AddResponse{}

@@ -12,13 +12,14 @@ import (
 )
 
 
-func GetMac(res http.ResponseWriter, req *http.Request, enc encoder.Encoder, arpFile string) (int, []byte) {
+func GetMac(res http.ResponseWriter, req *http.Request, enc encoder.Encoder, dataStore DataStore, arpFile string) (int, []byte) {
 	ip := strings.Split(req.RemoteAddr, ":")[0]
 	mac, err := GetMacAddress(arpFile, ip)
 	if err != nil {
 		return http.StatusNotFound, encoder.Must(enc.Encode(NewError(ErrMacNotFound, err.Error())))
 	}
-	return http.StatusOK, encoder.Must(enc.Encode(map[string]string {"mac":mac,}))
+	exists, err := dataStore.DeviceExists(mac)
+	return http.StatusOK, encoder.Must(enc.Encode(map[string]interface{} {"mac":mac, "registered": exists}))
 }
 
 func GetUsers(dataStore DataStore, enc encoder.Encoder) (int, []byte) {

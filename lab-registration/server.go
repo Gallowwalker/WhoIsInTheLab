@@ -1,9 +1,9 @@
 package main
 
 import (
-	"net/http"
-	"log"
 	"flag"
+	"log"
+	"net/http"
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
@@ -23,8 +23,7 @@ func JsonContent(c martini.Context, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 }
 
-
-func SetupMartini() (*martini.Martini) {
+func SetupMartini() *martini.Martini {
 	m := martini.New()
 	m.Use(martini.Recovery())
 	m.MapTo(encoder.JsonEncoder{}, (*encoder.Encoder)(nil))
@@ -41,7 +40,6 @@ func SetupMartini() (*martini.Martini) {
 	return m
 }
 
-
 func main() {
 	flag.Parse()
 	conf := ReadConfig(configFile)
@@ -52,7 +50,6 @@ func main() {
 	var dataStore DataStore = CreateMysqlDataStoreFromConfig(conf)
 	m.MapTo(dataStore, (*DataStore)(nil))
 	m.Map(arpTableFile)
-
 
 	log.Fatal(http.ListenAndServe(":8080", m))
 }
