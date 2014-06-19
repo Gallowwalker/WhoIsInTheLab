@@ -10,6 +10,7 @@ labRegistration.controller('LabRegCtrl', ['$scope', '$http', function ($scope, $
 	$scope.macValid = true;
 	$scope.hasApiError = false;
 	$scope.error = {}
+	$scope.deviceRegistered = false;
 
 	$http.get('/users').success(function(users) {
 		$scope.users = users;
@@ -20,6 +21,10 @@ labRegistration.controller('LabRegCtrl', ['$scope', '$http', function ($scope, $
 	$http.get('/mac').success(function(data) {
 		$scope.hasErrors(false, {});
 		$scope.device.MAC = data.mac;
+		$scope.deviceRegistered = data.registered;
+		if ($scope.deviceRegistered) {
+			$scope.errors = "This device is already registered"; 
+		}
 	}).error(function(error) {
 		$scope.hasErrors(true, error.message);
 		$scope.macValid = false;
