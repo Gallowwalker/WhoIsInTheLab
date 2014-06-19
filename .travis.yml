@@ -6,6 +6,6 @@ services: mysql
 before_install: cd lab-registration
 script:
         go get -v -t github.com/smartystreets/goconvey &&
-        go test -testconfig ./test-data/travis_db.cfg 
+        go test -v -testconfig ./test-data/travis_db.cfg 
 notifications:
           email: false
