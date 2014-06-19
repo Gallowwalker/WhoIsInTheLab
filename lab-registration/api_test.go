@@ -50,6 +50,7 @@ func TestMacAPI(t *testing.T) {
 			So(w.Code, ShouldEqual, 200)
 			So(macResult["mac"], ShouldEqual, "00:16:0a:13:96:7e")
 			So(macResult["registered"], ShouldEqual, false)
+			So(macResult["device"], ShouldEqual, nil)
 		})
 	})
 
@@ -69,16 +70,7 @@ func TestMacAPI(t *testing.T) {
 			So(w.Code, ShouldEqual, 200)
 			So(macResult["mac"], ShouldEqual, "00:16:0a:13:96:7e")
 			So(macResult["registered"], ShouldEqual, true)
-		})
-	})
-	Convey("Given that user hits /mac endpoint with an ip that is not present in arp table", t, func() {
-		r, _ := http.NewRequest("GET", "/mac", nil)
-		r.RemoteAddr = "8.8.8.8"
-		w := httptest.NewRecorder()
-		DbApi().ServeHTTP(w, r)
-
-		Convey("it should respond with error code 404", func() {
-			So(w.Code, ShouldEqual, 404)
+			So(macResult["device"], ShouldNotEqual, nil)
 		})
 	})
 

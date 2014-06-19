@@ -115,20 +115,15 @@ func (d MySqlDatastore) AddDevice(userId int, device Device) (int64, error) {
 	return id, err
 }
 
-func (d MySqlDatastore) DeviceExists(mac string) (bool, error) {
-	rows, err := d.db.NamedQuery("SELECT count(who_devices.device_id) FROM who_devices WHERE device_MAC =:mac", map[string]interface{}{"mac": mac})
+func (d MySqlDatastore) GetDeviceByMac(mac string) (*Device, error) {
+	device := Device{}
+	err := d.db.Get(&device, "SELECT * FROM who_devices WHERE device_MAC=?", mac)
 	if err != nil {
 		log.Println(err)
-		return false, err
+		return nil, err
 	}
-	var count int64
-	for rows.Next() {
-		err := rows.Scan(&count)
-		if err != nil {
-			log.Println(err)
-			return false, err
-		}
+	if device.Id == 0 {
+		return nil, fmt.Errorf("Device with mac %s dosent exist", mac)
 	}
-	return count > 0, nil
-
+	return &device, nil
 }

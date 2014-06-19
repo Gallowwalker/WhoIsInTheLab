@@ -18,8 +18,12 @@ func GetMac(res http.ResponseWriter, req *http.Request, enc encoder.Encoder, dat
 	if err != nil {
 		return http.StatusNotFound, encoder.Must(enc.Encode(NewError(ErrMacNotFound, err.Error())))
 	}
-	exists, err := dataStore.DeviceExists(mac)
-	return http.StatusOK, encoder.Must(enc.Encode(map[string]interface{} {"mac":mac, "registered": exists}))
+	device, err := dataStore.GetDeviceByMac(mac)
+	responseMap := map[string]interface{} {"mac":mac, "registered": device != nil}
+	if device != nil {
+		responseMap["device"] = *device
+	}
+	return http.StatusOK, encoder.Must(enc.Encode(responseMap))
 }
 
 func GetUsers(dataStore DataStore, enc encoder.Encoder) (int, []byte) {

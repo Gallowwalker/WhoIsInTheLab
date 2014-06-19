@@ -7,5 +7,5 @@ type DataStore interface {
 	UpdateUser(userId int, user User) (error)
 	GetDevicesByUserId(userId int) ([]Device, error)
 	AddDevice(userId int, device Device) (int64, error)
-	DeviceExists(mac string) (bool, error)
+	GetDeviceByMac(mac string) (*Device, error)
 }
