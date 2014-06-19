@@ -20,10 +20,12 @@ labRegistration.controller('LabRegCtrl', ['$scope', '$http', function ($scope, $
 
 	$http.get('/mac').success(function(data) {
 		$scope.hasErrors(false, {});
-		$scope.device.MAC = data.mac;
 		$scope.deviceRegistered = data.registered;
 		if ($scope.deviceRegistered) {
-			$scope.errors = "This device is already registered"; 
+			$scope.device = data.device;
+			$scope.ownerSelected(data.device.user_id);
+		} else {
+			$scope.device.MAC = data.mac;
 		}
 	}).error(function(error) {
 		$scope.hasErrors(true, error.message);
@@ -49,7 +51,7 @@ labRegistration.controller('LabRegCtrl', ['$scope', '$http', function ($scope, $
 		} else {
 			$http.put('/users/' + $scope.user.selected.id, $scope.owner).success(function(response) {
 				$scope.hasErrors(false, {});
-				$scope.apiAddDevice(device, response.id);
+				// TODO: Update device
 			}).error(function(error) {
 				$scope.hasError(true, error.message);
 			});
@@ -66,8 +68,9 @@ labRegistration.controller('LabRegCtrl', ['$scope', '$http', function ($scope, $
 		});
 	};
 
-	$scope.ownerSelected = function(owner) {
-		$http.get('/users/' + owner.selected.id).success(function(owner) {
+	$scope.ownerSelected = function(ownerId) {
+		$http.get('/users/' + ownerId ).success(function(owner) {
+			$scope.user.selected = owner;
 			$scope.owner = owner;
 			$scope.hasErrors(false, {});
 		}).error(function(error) {
