@@ -51,7 +51,9 @@ labRegistration.controller('LabRegCtrl', ['$scope', '$http', function ($scope, $
 		} else {
 			$http.put('/users/' + $scope.user.selected.id, $scope.owner).success(function(response) {
 				$scope.hasErrors(false, {});
-				// TODO: Update device
+				if (!$scope.deviceRegistered) {
+					$scope.apiAddDevice(device, response.id); 
+				}
 			}).error(function(error) {
 				$scope.hasError(true, error.message);
 			});
