@@ -64,7 +64,16 @@ func (d MySqlDatastore) GetAllUsers() ([]SimpleUser, error) {
 
 func (d MySqlDatastore) GetUser(id int) (User, error) {
 	user := User{}
-	err := d.db.Get(&user, "SELECT * FROM who_users WHERE user_id=?", id)
+	err := d.db.Get(&user, `SELECT  user_name1, 
+					user_name2, 
+					user_twitter, 
+					user_email, 
+					user_facebook, 
+					user_tel, 
+					user_website,  
+					user_google_plus, 
+					user_fscheckin 
+					FROM who_users WHERE user_id=?`, id)
 	if err != nil {
 		return user, fmt.Errorf("User with id %d not found", id)
 	}
