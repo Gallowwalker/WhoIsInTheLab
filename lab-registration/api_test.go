@@ -129,6 +129,7 @@ func TestAddUser(t *testing.T) {
 			So(result.Success, ShouldEqual, true)
 			So(result.Id, ShouldBeGreaterThan, 0)
 			user := getUser(dbApi, result.Id)
+			So(user.Id, ShouldBeGreaterThan, 0)
 			So(user.FirstName, ShouldEqual, "JohnDoe")
 			So(user.Facebook, ShouldEqual, "john.the.doe")
 			So(user.Phone, ShouldEqual, "911")
