@@ -2,26 +2,38 @@
 # Simple deploy script for registration server
 
 # If no arguments specified print usage and exit
-[ $# -eq 0 ] && { echo "Usage: $0 [remote_ip]"; exit 1; }
+[ $# -eq 0 ] && { echo "Usage: $0 [remote_ip] [ssh_port] [arch]"; exit 1; }
+
+declare ssh_port=22
+declare target_arch=386
+
+if [ ${#2} != 0 ] 
+then
+	ssh_port=$2 
+fi
+if [ ${#3} != 0 ]
+then 
+	target_arch=$3
+fi
 
 echo "Updating js deps from bower"
 cd ../ && bower install
 
-echo "Cross compiling GO code for arm" 
+echo "Cross compiling GO code for " $target_arch 
 cd lab-registration
 go clean
-GOARCH=arm GOOS=linux go build
+GOARCH=386 GOOS=linux go build
 echo "Finished compiling GO code"
 
 echo "Archiving server binary and client side code"
 tar -cf lab-registration.tar ./lab-registration config public
 
 echo "Enter password to upload archive to remote host"
-scp ./lab-registration.tar hackafe@$1:/home/hackafe/ 
+scp -P$ssh_port ./lab-registration.tar hackafe@$1:/home/hackafe/ 
 
 
 echo "Enter password again to restart the server"
-ssh hackafe@$1 "bash -s" << EOF 
+ssh hackafe@$1 -p $ssh_port "bash -s" << EOF 
 			echo "Extracting server archive..."
 			mkdir -p lab-registration 
 			mv lab-registration.tar lab-registration 
