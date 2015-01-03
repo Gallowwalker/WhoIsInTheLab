@@ -22,7 +22,7 @@ cd ../ && bower install
 echo "Cross compiling GO code for " $target_arch 
 cd lab-registration
 go clean
-GOARCH=386 GOOS=linux go build
+GOARCH=$target_arch GOOS=linux go build
 echo "Finished compiling GO code"
 
 echo "Archiving server binary and client side code"
