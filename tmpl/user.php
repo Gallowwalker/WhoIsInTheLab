@@ -1,5 +1,5 @@
 <?
-$sImgSrc = "http://{$_SERVER['HTTP_HOST']}/who/img/";
+$sImgSrc = "http://{$_SERVER['HTTP_HOST']}/img/";
 ?>
 <li>
 	<div role="user">
