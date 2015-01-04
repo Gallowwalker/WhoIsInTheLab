@@ -5,6 +5,7 @@ import (
 	"strings"
 	"strconv"
 	"encoding/json"
+	"fmt"
 
 	"github.com/martini-contrib/encoder"
 	"github.com/martini-contrib/binding"
@@ -19,7 +20,9 @@ func GetMac(res http.ResponseWriter, req *http.Request, enc encoder.Encoder, dat
 		return http.StatusNotFound, encoder.Must(enc.Encode(NewError(ErrMacNotFound, err.Error())))
 	}
 	device, err := dataStore.GetDeviceByMac(mac)
+	fmt.Println("Error ", err)
 	responseMap := map[string]interface{} {"mac":mac, "registered": device != nil}
+	fmt.Println("Response map: ", responseMap)
 	if device != nil {
 		responseMap["device"] = *device
 	}
