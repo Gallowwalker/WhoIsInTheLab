@@ -47,6 +47,7 @@ func TestMacAPI(t *testing.T) {
 		var macResult map[string]interface{}
 		Convey("it should return the corresponding mac address", func() {
 			json.Unmarshal(w.Body.Bytes(), &macResult)
+			fmt.Println("Mac response: ", string(w.Body.Bytes()[:]))
 			So(w.Code, ShouldEqual, 200)
 			So(macResult["mac"], ShouldEqual, "00:16:0a:13:96:7e")
 			So(macResult["registered"], ShouldEqual, false)
@@ -87,7 +88,6 @@ func TestMacAPI(t *testing.T) {
 func TestAddUser(t *testing.T) {
 	Convey("Given that add user endpoint is called with valid data", t, func() {
 		userJson := ReadFile("./test-data/test_user.json")
-		fmt.Println("User json ", userJson)
 		r, _ := http.NewRequest("POST", "/users", strings.NewReader(userJson))
 		w := httptest.NewRecorder()
 		DbApi().ServeHTTP(w, r)
