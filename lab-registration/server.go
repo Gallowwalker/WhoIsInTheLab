@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
-	"github.com/martini-contrib/encoder"
 )
 
 var configFile string
@@ -26,7 +25,7 @@ func JsonContent(c martini.Context, w http.ResponseWriter, r *http.Request) {
 func SetupMartini() *martini.Martini {
 	m := martini.New()
 	m.Use(martini.Recovery())
-	m.MapTo(jsonEncoder{}, (*encoder.Encoder)(nil))
+	m.MapTo(jsonEncoder{}, (*encoder)(nil))
 
 	r := martini.NewRouter()
 	r.Get("/mac", JsonContent, GetMac)
