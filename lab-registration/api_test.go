@@ -47,7 +47,6 @@ func TestMacAPI(t *testing.T) {
 		var macResult map[string]interface{}
 		Convey("it should return the corresponding mac address", func() {
 			json.Unmarshal(w.Body.Bytes(), &macResult)
-			fmt.Println("Mac response: ", string(w.Body.Bytes()[:]))
 			So(w.Code, ShouldEqual, 200)
 			So(macResult["mac"], ShouldEqual, "00:16:0a:13:96:7e")
 			So(macResult["registered"], ShouldEqual, false)

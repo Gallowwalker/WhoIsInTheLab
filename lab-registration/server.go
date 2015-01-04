@@ -26,7 +26,7 @@ func JsonContent(c martini.Context, w http.ResponseWriter, r *http.Request) {
 func SetupMartini() *martini.Martini {
 	m := martini.New()
 	m.Use(martini.Recovery())
-	m.MapTo(encoder.JsonEncoder{}, (*encoder.Encoder)(nil))
+	m.MapTo(jsonEncoder{}, (*encoder.Encoder)(nil))
 
 	r := martini.NewRouter()
 	r.Get("/mac", JsonContent, GetMac)
