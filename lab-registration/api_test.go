@@ -23,7 +23,7 @@ func init() {
 }
 func MockApi() *martini.Martini {
 	m := SetupMartini()
-	m.Map("test-data/arp-data")
+	m.Map("./test-data/arp-data")
 	return m
 }
 
@@ -87,6 +87,7 @@ func TestMacAPI(t *testing.T) {
 func TestAddUser(t *testing.T) {
 	Convey("Given that add user endpoint is called with valid data", t, func() {
 		userJson := ReadFile("./test-data/test_user.json")
+		fmt.Println("User json ", userJson)
 		r, _ := http.NewRequest("POST", "/users", strings.NewReader(userJson))
 		w := httptest.NewRecorder()
 		DbApi().ServeHTTP(w, r)
